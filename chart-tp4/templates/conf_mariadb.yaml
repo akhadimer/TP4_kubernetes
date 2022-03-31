@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+  labels:
+    app: maria-db
+  name: maria-db
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: maria-db
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: maria-db
+    spec:
+      containers:
+        - image: mariadb:10.7
+          imagePullPolicy: Always
+          name: maria-db
+          resources: {}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: rootPassword
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: db
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: {{ .Values.webserver.volumeMount.name }}
+              mountPath: {{ .Values.webserver.volumeMount.mountPath }}
+  
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: {{ .Values.webserver.volumes.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.webserver.volumes.claimName }}
+        - name: {{ .Values.maria-db.volumes.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.maria-db.volumes.claimName }}
+  
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.PVC.mariadb.name }}
+  namespace: default
+spec:
+  volumeName: {{ .Values.PVC.mariadb.volumeName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.PVC.mariadb.size }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .Values.PV.mariadb.name }}
+spec:
+  accessModes:
+      - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  capacity:
+      storage: {{ .Values.PV.mariadb.size }}
+  hostPath:
+      path: {{ .Values.PV.mariadb.path }}
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: maria-db
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: maria-db
