@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.PVC.webserver.name }}
+  namespace: default
+spec:
+  volumeName: {{ .Values.PVC.webserver.volumeName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.PVC.webserver.size }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .Values.PV.webserver.name }}
+spec:
+    accessModes:
+        - ReadWriteOnce
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: standard
+    capacity:
+        storage: {{ .Values.PV.webserver.size }}
+    hostPath:
+        path: {{ .Values.PV.webserver.path }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.PVC.mariadb.name }}
+  namespace: default
+spec:
+  volumeName: {{ .Values.PVC.mariadb.volumeName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.PVC.mariadb.size }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: {{ .Values.PV.mariadb.name }}
+spec:
+  accessModes:
+      - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  capacity:
+      storage: {{ .Values.PV.mariadb.size }}
+  hostPath:
+      path: {{ .Values.PV.mariadb.path }}

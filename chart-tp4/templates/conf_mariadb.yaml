@@ -66,49 +66,6 @@ spec:
         - name: {{ .Values.webserver.volumes.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.webserver.volumes.claimName }}
-        - name: {{ .Values.maria-db.volumes.name }}
+        - name: {{ .Values.mariadb.volumes.name }}
           persistentVolumeClaim:
-            claimName: {{ .Values.maria-db.volumes.claimName }}
-  
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ .Values.PVC.mariadb.name }}
-  namespace: default
-spec:
-  volumeName: {{ .Values.PVC.mariadb.volumeName }}
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ .Values.PVC.mariadb.size }}
-
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-    name: {{ .Values.PV.mariadb.name }}
-spec:
-  accessModes:
-      - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: standard
-  capacity:
-      storage: {{ .Values.PV.mariadb.size }}
-  hostPath:
-      path: {{ .Values.PV.mariadb.path }}
-  
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: maria-db
-spec:
-  ports:
-    - port: 3306
-  selector:
-    app: maria-db
+            claimName: {{ .Values.mariadb.volumes.claimName }}
