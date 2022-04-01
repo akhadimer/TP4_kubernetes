@@ -38,6 +38,6 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-          - name: {{ .Values.webserver.volumes.name }}
-            persistentVolumeClaim:
-                claimName: {{ .Values.webserver.volumes.claimName }}
+        - name: {{ .Values.webserver.volumes.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.webserver.volumes.claimName }}

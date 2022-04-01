@@ -5,20 +5,20 @@
 PV:
  webserver:
   name: deno-server
-  size: 3Gi
+  size: 2Gi
   path: /data/deno-server/
   persistentVolumeReclaimPolicy: Retain
  mariadb:
   name: maria-db
-  size: 10Gi
+  size: 5Gi
   path: /data/maria-db/
   persistentVolumeReclaimPolicy: Retain
 
 PVC:
  webserver:
-  name: webserver
+  name: logs
   size: 1Gi
-  volumeName: webserver
+  volumeName: deno-server
  mariadb:
   name: maria-db
   size: 1Gi
